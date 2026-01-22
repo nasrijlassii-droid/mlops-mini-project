@@ -1,11 +1,11 @@
-version: "3.9"
+ #version: "3.9"
 
 services:
   # -----------------------------------------------------------------
   # 1️⃣ MLflow tracking server
   # -----------------------------------------------------------------
   mlflow:
-    image: mlflow/mlflow:2.12.1
+    image: mlflow/mlflow:2.12.0
     container_name: mlflow
     ports:
       - "5000:5000"
