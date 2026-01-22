@@ -1,15 +1,20 @@
  #version: "3.9"
+# -------------------------------------------------
+# Docker‑Compose pour le mini‑projet MLOps
+# -------------------------------------------------
+# (le champ `version:` est obsolète avec Compose v2, on le commente)
+# version: "3.9"
+
 services:
   # -----------------------------------------------------------------
-  # 1️⃣ MLflow tracking server – utilise l’image officielle (tag latest)
+  # 1️⃣ MLflow tracking server – construit avec votre Dockerfile
   # -----------------------------------------------------------------
   mlflow:
-    image: mlflow/mlflow:latest            # <- image qui existe sur Docker Hub
+    build: .                         # << utilise le Dockerfile du projet
     container_name: mlflow
     ports:
       - "5000:5000"
     environment:
-      # On fixe les valeurs directement (pas de variables d‑shell)
       - BACKEND_STORE_URI=sqlite:////mlflow/mlflow.db
       - DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
     command: >
@@ -19,13 +24,13 @@ services:
       --backend-store-uri ${BACKEND_STORE_URI}
       --default-artifact-root ${DEFAULT_ARTIFACT_ROOT}
     volumes:
-      - ./mlflow:/mlflow               # persistance du DB + des artefacts
+      - ./mlflow:/mlflow            # persistance du DB + artefacts
 
   # -----------------------------------------------------------------
-  # 2️⃣ FastAPI inference API (utilise votre Dockerfile du projet)
+  # 2️⃣ FastAPI inference API – construit avec le même Dockerfile
   # -----------------------------------------------------------------
   api:
-    build: .                                # Dockerfile du projet → FastAPI
+    build: .                         # même Dockerfile que `mlflow`
     container_name: iris_api
     ports:
       - "8000:8000"
@@ -35,16 +40,16 @@ services:
     depends_on:
       - mlflow
     volumes:
-      - ./mlflow:/mlflow               # partage les artefacts MLflow
-      - ./src:/app/src                 # code source (facultatif, juste pour debug)
+      - ./mlflow:/mlflow            # partage les artefacts MLflow
+      - ./src:/app/src              # code source (facultatif, utile pour debug)
     command: >
       uvicorn src.api:app --host 0.0.0.0 --port 8000
 
   # -----------------------------------------------------------------
-  # 3️⃣ Trainer (exécute le pipeline ZenML à la demande)
+  # 3️⃣ Trainer – exécute le pipeline ZenML à la demande
   # -----------------------------------------------------------------
   trainer:
-    build: .                                # même image que l'API
+    build: .                         # même image que `api`
     container_name: iris_trainer
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
