@@ -1,26 +1,24 @@
  #version: "3.9"
-
 services:
   # -----------------------------------------------------------------
   # 1️⃣ MLflow tracking server
   # -----------------------------------------------------------------
   mlflow:
-    build: .                         # utilise le Dockerfile du projet
+    image: mlflow/mlflow:2.12.2          # ← version officielle qui existe
     container_name: mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - BACKEND_STORE_URI=sqlite:////mlflow/mlflow.db
+      - DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
     command: >
       mlflow server
       --host 0.0.0.0
       --port 5000
-      --backend-store-uri sqlite:////mlflow/mlflow.db
-      --default-artifact-root /mlflow/artifacts
-    ports:
-      - "5000:5000"
-    environment:
-      # Ces variables seront lues par les autres services (API, trainer)
-      - MLFLOW_TRACKING_URI=http://mlflow:5000
-      - MLFLOW_ARTIFACT_ROOT=/mlflow/artifacts
+      --backend-store-uri ${BACKEND_STORE_URI}
+      --default-artifact-root ${DEFAULT_ARTIFACT_ROOT}
     volumes:
-      - ./mlflow:/mlflow            # persistance des métadonnées et artefacts
+      - ./mlflow:/mlflow               # persistance des DB + artefacts
 
   # -----------------------------------------------------------------
   # 2️⃣ FastAPI inference API
