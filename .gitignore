@@ -27,7 +27,7 @@ mlruns/
 mlflow/tmp/
 
 # ── Data ----------------------------------------------------------------
-data/raw/
+# data/raw/
 data/processed/
 dvc_remote/
 
