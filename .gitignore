@@ -1,0 +1,46 @@
+# ── Python / virtualenv -------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.dist-info/
+*.sqlite3
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+
+# ── DVC -----------------------------------------------------------------
+.dvc/
+.dvcignore
+.dvc/tmp/
+dvc.lock
+dvc/config
+dvc/config.lock
+
+# ── MLflow --------------------------------------------------------------
+mlflow/
+mlflow_artifacts/
+mlruns/
+mlflow/tmp/
+
+# ── Data ----------------------------------------------------------------
+data/raw/
+data/processed/
+dvc_remote/
+
+# ── Docker ---------------------------------------------------------------
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+*.dockerignore
+
+# ── Jupyter / notebooks -------------------------------------------------
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS / divers ---------------------------------------------------------
+.DS_Store
+Thumbs.db
