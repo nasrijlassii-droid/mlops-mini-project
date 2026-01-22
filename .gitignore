@@ -30,11 +30,11 @@ mlflow/tmp/
 # data/raw/
 data/processed/
 dvc_remote/
-
+!data/raw/*.dvc
 # ── Docker ---------------------------------------------------------------
-Dockerfile
-docker-compose.yml
-docker-compose.override.yml
+#Dockerfile
+#docker-compose.yml
+#docker-compose.override.yml
 *.dockerignore
 
 # ── Jupyter / notebooks -------------------------------------------------
