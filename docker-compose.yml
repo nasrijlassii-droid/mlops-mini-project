@@ -1,14 +1,15 @@
  #version: "3.9"
 services:
   # -----------------------------------------------------------------
-  # 1️⃣ MLflow tracking server
+  # 1️⃣ MLflow tracking server – utilise l’image officielle (tag latest)
   # -----------------------------------------------------------------
   mlflow:
-    image: mlflow/mlflow:2.12.2          # ← version officielle qui existe
+    image: mlflow/mlflow:latest            # <- image qui existe sur Docker Hub
     container_name: mlflow
     ports:
       - "5000:5000"
     environment:
+      # On fixe les valeurs directement (pas de variables d‑shell)
       - BACKEND_STORE_URI=sqlite:////mlflow/mlflow.db
       - DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
     command: >
@@ -18,13 +19,13 @@ services:
       --backend-store-uri ${BACKEND_STORE_URI}
       --default-artifact-root ${DEFAULT_ARTIFACT_ROOT}
     volumes:
-      - ./mlflow:/mlflow               # persistance des DB + artefacts
+      - ./mlflow:/mlflow               # persistance du DB + des artefacts
 
   # -----------------------------------------------------------------
-  # 2️⃣ FastAPI inference API
+  # 2️⃣ FastAPI inference API (utilise votre Dockerfile du projet)
   # -----------------------------------------------------------------
   api:
-    build: .
+    build: .                                # Dockerfile du projet → FastAPI
     container_name: iris_api
     ports:
       - "8000:8000"
@@ -34,8 +35,8 @@ services:
     depends_on:
       - mlflow
     volumes:
-      - ./mlflow:/mlflow
-      - ./src:/app/src
+      - ./mlflow:/mlflow               # partage les artefacts MLflow
+      - ./src:/app/src                 # code source (facultatif, juste pour debug)
     command: >
       uvicorn src.api:app --host 0.0.0.0 --port 8000
 
@@ -43,7 +44,7 @@ services:
   # 3️⃣ Trainer (exécute le pipeline ZenML à la demande)
   # -----------------------------------------------------------------
   trainer:
-    build: .
+    build: .                                # même image que l'API
     container_name: iris_trainer
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
@@ -56,4 +57,5 @@ services:
       - ./data:/app/data
       - ./.zen:/app/.zen
     entrypoint: ["/bin/bash","-c"]
-    # Lancer le pipeline : docker compose run trainer ./run_pipeline.sh
+    # Exemple d’appel : docker compose run trainer ./run_pipeline.sh
+
